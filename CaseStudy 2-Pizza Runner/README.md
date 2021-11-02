@@ -371,7 +371,7 @@ CREATE TEMP TABLE cleaned_customer_orders AS (
       WHEN exclusions = '' THEN NULL
       WHEN exclusions = 'null' THEN NULL
       ELSE exclusions
-    END AS exlcusions,
+    END AS exclusions,
     CASE
       WHEN extras = '' THEN NULL
       WHEN extras = 'null' THEN NULL
@@ -455,7 +455,8 @@ ALTER COLUMN duration INT;
 
 <h1><b>🛠Solution</b></h1>
 
-##Pizza Metrics
+## Pizza Metrics
+
 **1.How many pizzas were ordered?**
 
 ```sql
@@ -545,4 +546,109 @@ There are 9  Meatlovers pizzas and 3 Vegetarian pizzas were delivered.
 | 103         | Vegetarian | 1           |
 | 104         | Meatlovers | 3           |
 | 105         | Vegetarian | 1           |
+
+**Insight**
+Customer 101 ordered 2 Meatlovers and 1 Vegetarian pizza.Customer 102 ordered 2 Meatlovers  and 2 Vegetarian pizzas.
+Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.Customer 104 and 105  ordered 1 Meatlovers pizza and 1 Vegetarian pizza respectively.
+
+**6.What was the maximum number of pizzas delivered in a single order?**
+
+Sum number o
+
+```sql
+ WITH cte_get_total_pizza as(
+        SELECT 
+            c.order_id, 
+            count(pizza_id) AS total_pizza
+         FROM pizza_runner.cleaned_runner_orders
+         JOIN pizza_runner.cleaned_customer_orders c USING (order_id)
+         WHERE  cancellation IS NUll 
+         GROUP BY c.order_id)
+            
+         SELECT  
+          MAX(total_pizza) AS pizza_count
+        FROM cte_get_total_pizza;
+```
+| pizza_count |
+| ----------- |
+| 3           |
+
+**Insight**
+Maximum number of pizza delivered in a single order is 3 pizzas.
+
+**7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+```sql
+    SELECT
+      customer_id,
+      SUM(
+        CASE
+          WHEN exclusions IS NOT NULL OR extras IS NOT NULL THEN 1
+          ELSE 0
+        END
+      ) AS at_least_1_change,
+      SUM(
+        CASE
+          WHEN exclusions IS NULL AND extras IS NULL THEN 1
+          ELSE 0
+        END
+      ) AS no_changes
+      
+      FROM pizza_runner.cleaned_runner_orders
+             JOIN pizza_runner.cleaned_customer_orders c USING (order_id)
+             WHERE  cancellation IS NUll 
+             GROUP BY c.customer_id;
+```
+| customer_id | at_least_1_change | no_changes |
+| ----------- | ----------------- | ---------- |
+| 101         | 0                 | 2          |
+| 102         | 0                 | 3          |
+| 103         | 3                 | 0          |
+| 104         | 2                 | 1          |
+| 105         | 1                 | 0          |
+
+**Insight**
+Customer 101 and 102 ordered the original recipe. while Customer 103, 104 and 105 have their own preference for pizza topping and requested at least 1 change (extra or exclusion topping) on their pizza.
+
+**8. How many pizzas were delivered that had both exclusions and extras?**
+
+```sql
+    SELECT
+       SUM(
+        CASE
+          WHEN exclusions IS NOT NULL and extras IS NOT NULL THEN 1
+          ELSE 0
+        END
+      ) AS at_least_1_change
+        
+      FROM pizza_runner.cleaned_runner_orders
+             JOIN pizza_runner.cleaned_customer_orders c USING (order_id)
+             WHERE  cancellation IS NUll;
+```
+| at_least_1_change |
+| ----------------- |
+| 1                 |
+
+**Insight**
+Only 1 pizza delivered that had both extra and exclusion topping. 
+
+
+**9.What was the total volume of pizzas ordered for each hour of the day?**
+ Extract() function extracts a subfield from a date or time value. this will help us extract hour
+  ```sql
+  SELECT 
+      extract(hour from  order_time) AS hour_of_day, 
+      COUNT( *) AS pizza_count
+    FROM pizza_runner.cleaned_customer_orders
+    GROUP BY hour_of_day
+    ORDER by 2 desc;
+```
+| hour_of_day | pizza_count |
+| ----------- | ----------- |
+| 18          | 3           |
+| 23          | 3           |
+| 21          | 3           |
+| 13          | 3           |
+| 11          | 1           |
+| 19          | 1           |
+
 
