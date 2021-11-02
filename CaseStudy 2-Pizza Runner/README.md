@@ -99,8 +99,8 @@ Danny has shared with  6 interconnected datasets for this case study
 **1.Get a preview of the ``customer_orders`` table.**
  ```sql
  SELECT * 
-    FROM pizza_runner.customer_orders
-    LIMIT 10;
+ FROM pizza_runner.customer_orders
+ LIMIT 10;
 ```
 | order_id | customer_id | pizza_id | exclusions | extras | order_time               |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------------ |
@@ -130,14 +130,14 @@ FROM pizza_runner.customer_orders;
 **Observation**
 Customer order table contains 14 records
 ```sql
-    SELECT
+ SELECT
       table_name,
       column_name,
       data_type,
       column_default,
       is_nullable
-    FROM information_schema.columns
-    WHERE table_name = 'customer_orders';
+  FROM information_schema.columns
+  WHERE table_name = 'customer_orders';
 ```
 | table_name      | column_name | data_type                   | column_default | is_nullable |
 | --------------- | ----------- | --------------------------- | -------------- | ----------- |
@@ -182,8 +182,8 @@ Customer order table contains 14 records
           data_type,
           column_default,
           is_nullable
-        FROM information_schema.columns
-        WHERE table_name = 'runner_orders';
+   FROM information_schema.columns
+   WHERE table_name = 'runner_orders';
 ```
 | table_name    | column_name  | data_type         | column_default | is_nullable |
 | ------------- | ------------ | ----------------- | -------------- | ----------- |
@@ -195,8 +195,116 @@ Customer order table contains 14 records
 | runner_orders | cancellation | character varying |    null        | YES         |
  
   
-  
+ ## Table#3 - runner
+```sql
+SELECT  * FROM pizza_runner.runners;
+```
+
+| runner_id | registration_date        |
+| --------- | ------------------------ |
+| 1         | 2021-01-01T00:00:00.000Z |
+| 2         | 2021-01-03T00:00:00.000Z |
+| 3         | 2021-01-08T00:00:00.000Z |
+| 4         | 2021-01-15T00:00:00.000Z |
+	
+ ```sql
+SELECT  COUNT(*) FROM pizza_runner.runners;
+```
+| count |
+| ----- |
+| 4     |
+	
+	
+```sql
+SELECT
+          table_name,
+          column_name,
+          data_type,
+          column_default,
+          is_nullable
+FROM information_schema.columns
+WHERE table_name = 'runners';
+```
+| table_name | column_name       | data_type | column_default | is_nullable |
+| ---------- | ----------------- | --------- | -------------- | ----------- |
+| runners    | runner_id         | integer   |     null       | YES         |
+| runners    | registration_date | date      |     null       | YES         |	
+
+	
+ ## Table#4 - pizza_names
+```sql	
+SELECT * FROM pizza_runner.pizza_names;
+```
+| pizza_id | pizza_name |
+| -------- | ---------- |
+| 1        | Meatlovers |
+| 2        | Vegetarian |
+	
+	
+```sql
+  SELECT  COUNT(*) FROM pizza_runner.pizza_names;
+```
+| count |
+| ----- |
+| 2     |
+	
+```sql
+  SELECT
+      table_name,
+      column_name,
+      data_type,
+      column_default,
+      is_nullable
+ FROM information_schema.columns
+ WHERE table_name = 'pizza_names';
+```
+	
+| table_name  | column_name | data_type | column_default | is_nullable |
+| ----------- | ----------- | --------- | -------------- | ----------- |
+| pizza_names | pizza_id    | integer   |   null         | YES         |
+| pizza_names | pizza_name  | text      |   null         | YES         |
+	
+## Table#5 - pizza_toppings
+	
+```sql	
+SELECT * FROM pizza_runner.pizza_toppings limit 5;
+```
+| topping_id | topping_name |
+| ---------- | ------------ |
+| 1          | Bacon        |
+| 2          | BBQ Sauce    |
+| 3          | Beef         |
+| 4          | Cheese       |
+| 5          | Chicken      |
+
+```sql	
+ SELECT count(*) FROM pizza_runner.pizza_toppings;
+```
+	
+| count |
+| ----- |
+| 12    |
+	
+```sql	
+	SELECT
+              table_name,
+              column_name,
+              data_type,
+              column_default,
+              is_nullable
+    FROM information_schema.columns
+    WHERE table_name = 'pizza_toppings';
+```
+| table_name     | column_name  | data_type | column_default | is_nullable |
+| -------------- | ------------ | --------- | -------------- | ----------- |
+| pizza_toppings | topping_id   | integer   |     null       | YES         |
+| pizza_toppings | topping_name | text      |     null       | YES         |
+	
 </details>
+
+
+
+
 
 # 👩‍💻Data Preprocessing
 <details>
