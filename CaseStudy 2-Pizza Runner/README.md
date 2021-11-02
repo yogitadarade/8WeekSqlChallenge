@@ -501,6 +501,7 @@ SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
 
 ```
 **Insight**
+
 Runner 1 has 4 successful delivered order  , and runner 2 and 3 each delivered 3 ,1  order respectively.
 
 **4.How many of each type of pizza was delivered?**
@@ -521,6 +522,7 @@ Runner 1 has 4 successful delivered order  , and runner 2 and 3 each delivered 3
 | Meatlovers | 9     |
 
 **Insight**
+
 There are 9  Meatlovers pizzas and 3 Vegetarian pizzas were delivered.
 
 **5.How many Vegetarian and Meatlovers were ordered by each customer?**
@@ -548,6 +550,7 @@ There are 9  Meatlovers pizzas and 3 Vegetarian pizzas were delivered.
 | 105         | Vegetarian | 1           |
 
 **Insight**
+
 Customer 101 ordered 2 Meatlovers and 1 Vegetarian pizza.Customer 102 ordered 2 Meatlovers  and 2 Vegetarian pizzas.
 Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.Customer 104 and 105  ordered 1 Meatlovers pizza and 1 Vegetarian pizza respectively.
 
@@ -574,6 +577,7 @@ Sum number o
 | 3           |
 
 **Insight**
+
 Maximum number of pizza delivered in a single order is 3 pizzas.
 
 **7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
@@ -606,7 +610,8 @@ Maximum number of pizza delivered in a single order is 3 pizzas.
 | 104         | 2                 | 1          |
 | 105         | 1                 | 0          |
 
-**Insight**
+**Insights**
+
 Customer 101 and 102 ordered the original recipe. while Customer 103, 104 and 105 have their own preference for pizza topping and requested at least 1 change (extra or exclusion topping) on their pizza.
 
 **8. How many pizzas were delivered that had both exclusions and extras?**
@@ -628,11 +633,13 @@ Customer 101 and 102 ordered the original recipe. while Customer 103, 104 and 10
 | ----------------- |
 | 1                 |
 
-**Insight**
+**Insights**
+
 Only 1 pizza delivered that had both extra and exclusion topping. 
 
 
 **9.What was the total volume of pizzas ordered for each hour of the day?**
+
  Extract() function extracts a subfield from a date or time value. this will help us extract hour
   ```sql
   SELECT 
@@ -651,4 +658,25 @@ Only 1 pizza delivered that had both extra and exclusion topping.
 | 11          | 1           |
 | 19          | 1           |
 
+**Insights**
 
+Highest volume of pizza ordered is at 18 (6:00-7:00 pm), 23 (11:00-12 pm) ,13(1:00-2 pm)and 21 (9:00-10.00 pm).
+Lowest volume of pizza ordered is at 11 (11:00-12:00 am), 19 (7:00-8:00 pm) 
+
+ **10.What was the volume of orders for each day of the week?**
+ ```sql
+ SELECT to_char( order_time, 'DAY' ) AS DAY, COUNT(*)
+    FROM pizza_runner.cleaned_customer_orders
+    GROUP BY DAY
+    ORDER by 2 desc;
+```
+| day       | count |
+| --------- | ----- |
+| WEDNESDAY | 5     |
+| SATURDAY  | 5     |
+| THURSDAY  | 3     |
+| FRIDAY    | 1     |
+
+
+**Insights**
+Wednesday and Saturday are most popular days for ordering Pizza
