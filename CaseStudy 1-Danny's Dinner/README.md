@@ -7,25 +7,25 @@
 
 
 # Table of contents
-- [📚About](#-about)
-- [📜Problem Statement](#-problem-statement)
-- [📌❓Case Study Questions](#-case-study-questions)
-- [🕵️‍♀️Understand & Explore Data](#-Understand-Data)
-- [⚒Solution](#-Solution)
+- [📚About](#About)
+- [📜Problem Statement](#Problem-statement)
+- [📌❓Case Study Questions](#Case-Study-Questions)
+- [🕵️‍♀️Understand & Explore Data](#Understand-Data)
+- [⚒Solution](#Solution)
 
-# 📚About
+<h1><b>📚About</b></h1>
 
 Danny seriously loves Japanese food so in the beginning of 2021, he decides to embark upon a risky venture and opens up a cute little restaurant that sells his 3 favourite foods: sushi, curry and ramen.
 
 Danny’s Diner is in need of your assistance to help the restaurant stay afloat - the restaurant has captured some very basic data from their few months of operation but have no idea how to use their data to help them run the business.
 
-# 📜Problem Statement
+<h1><b>📜Problem Statement</b></h1>
 
 Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. Having this deeper connection with his customers will help him deliver a better and more personalised experience for his loyal customers.
 
 He plans on using these insights to help him decide whether he should expand the existing customer loyalty program - additionally he needs help to generate some basic datasets so his team can easily inspect the data without needing to use SQL.
 
-# 📌❓Case Study Questions
+<h1><b> 📌❓Case Study Questions</b></h1>
 
 These are the questions that were provided:
 
@@ -40,7 +40,7 @@ These are the questions that were provided:
 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
-# 🕵️‍♀️ Understand  and Explore Data
+<h1><b>🕵️‍Understand  and Explore Data</b></h1>
 Danny provided a sample of his overall customer data due to privacy issues. He also provided an entity-relationship diagram (ERD).
 
 ![erd danny diner](ERD.png)
@@ -54,12 +54,12 @@ There are 3 tables in the ERD:
 ## Table#1 - sales
 
 **1.Get a preview of the ``sales`` table.**
-
+```sql
 SELECT
   	* 
 FROM dannys_diner.sales
 LIMIT 5;
-
+```
 | customer_id | order_date               | product_id |
 | ----------- | ------------------------ | ---------- |
 | A           | 2021-01-01T00:00:00.000Z | 1          |
@@ -71,7 +71,7 @@ LIMIT 5;
 **Observation**
 This table contains  ``customer_id`` and product they purchased on a given  ``order_date``.
 
-A ``COUNT`` was used to do a row count of the ``sales`` table.
+``COUNT`` number of records in the sale table
 
 ```sql
 SELECT 
@@ -89,7 +89,8 @@ There were a total of 15 sales in the ``sales`` table.
 
 **2. Check Datatypes, default values, and if the columns can contains null records**
  This table was created with the script and we have access to ERD , but it is good practice to check the datatypes before move ahead which questions
-     SELECT
+ ```sql   
+    SELECT
       table_name,
       column_name,
       data_type,
@@ -97,7 +98,7 @@ There were a total of 15 sales in the ``sales`` table.
      is_nullable
     FROM information_schema.columns
     WHERE table_name = 'sales';
-
+```
 
 | table_name | column_name | data_type         | column_default | is_nullable |
 | ---------- | ----------- | ----------------- | -------------- | ----------- |
@@ -109,11 +110,12 @@ There were a total of 15 sales in the ``sales`` table.
 Columns can contain null values
 
 **3. Check for any null values in columns**
+```sql
  SELECT *  
  FROM dannys_diner.sales
  WHERE customer_id IS NULL or
  order_date IS NULL or product_id IS NULL
- 
+ ```
 **Observation**
 No null values were found
 
@@ -157,13 +159,13 @@ The ``menu`` table is linked to the previous ``sales`` table via the ``product_i
 Columns can contain null values
 
 **3. Check for any null values in columns**
-
+```sql
     SELECT
     FROM  dannys_diner.menu
     WHERE product_id IS NULL OR
     price IS NULL OR
     product_name IS NULL ;
- 
+ ```
 **Observation**
 No null values were found
 
@@ -183,9 +185,10 @@ LIMIT 5;
 **Observation**
 This table contains the ``customer_id`` and date when the joined reward program of the restaurant.
 
-# ⚒ Solution
+<h1><b>🛠Solution</b></h1>
 
--- 1. What is the total amount each customer spent at the restaurant?
+**1. What is the total amount each customer spent at the restaurant?**
+```sql
 SELECT 
 	sales.customer_id,
   SUM(menu.price) AS total_spent
@@ -194,7 +197,7 @@ JOIN dannys_diner.menu
 	ON sales.product_id = menu.product_id
 GROUP BY customer_id
 ORDER BY customer_id;
-
+```
 --Result:
 +──────────────+──────────────+
 | customer_id  | total_spent  |
@@ -208,13 +211,14 @@ ORDER BY customer_id;
 
 Customer A spent 76$ in total, Customer B spent 74$ in total and Customer C spent only 36$ in total.
 
--- 2. How many days has each customer visited the restaurant?
+**2. How many days has each customer visited the restaurant?**
+```sql
 SELECT
   customer_id,
   COUNT (DISTINCT order_date) AS visited_days
 FROM dannys_diner.sales
 GROUP BY customer_id;
-
+```
 --Result:
 +──────────────+───────────────+
 | customer_id  | visited_days  |
@@ -228,7 +232,8 @@ GROUP BY customer_id;
 
 Customer B visited the store 6 times, customer A 4 times and customer C only 2 times.
 
--- 3. What was the first item from the menu purchased by each customer?
+**3. What was the first item from the menu purchased by each customer?**
+```sql
 WITH cte_order AS (
   SELECT
     sales.customer_id,
@@ -245,7 +250,7 @@ WITH cte_order AS (
 )
 SELECT * FROM cte_order
 WHERE item_order = 1;
-
+```
 --Result:
 +──────────────+───────────────+─────────────+
 | customer_id  | product_name  | item_order  |
@@ -259,7 +264,8 @@ WHERE item_order = 1;
 
 Customer A had curry and sushi for the first time, customer B had curry and customer C had ramen.
 
--- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+**4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
+```sql
 SELECT
   menu.product_name,
   COUNT(sales.product_id) AS order_count
@@ -270,7 +276,7 @@ GROUP BY
   menu.product_name
 ORDER BY order_count DESC
 LIMIT 1;
-
+```
 --Result:
 +─────────────+───────────────+──────────────+
 | product_id  | product_name  | order_count  |
@@ -281,8 +287,8 @@ LIMIT 1;
  **Insights:**
 
 The most consumed product was ramen as it was purchased 8 times.
-
--- 5. Which item was the most popular for each customer?
+**5. Which item was the most popular for each customer?**
+```sql
 WITH cte_order_count AS (
   SELECT
     sales.customer_id,
@@ -306,7 +312,7 @@ cte_popular_rank AS (
 )
 SELECT * FROM cte_popular_rank
 WHERE rank = 1;
-
+```
 --Result:
 +──────────────+───────────────+──────────────+───────+
 | customer_id  | product_name  | order_count  | rank  |
@@ -322,8 +328,9 @@ WHERE rank = 1;
 
 The favorite dish of customer A & customer C is ramen while the favorite dishes for customer B are curry, ramen and sushi.
 
--- 6. Which item was purchased first by the customer after they became a member?
---Note: In this question, the orders made during the join date are counted within the first order as well
+**6. Which item was purchased first by the customer after they became a member?**
+
+ ```sql
     WITH
         cte_first_member_order
         AS
@@ -340,7 +347,7 @@ The favorite dish of customer A & customer C is ramen while the favorite dishes 
     SELECT customer_id,product_name,order_date
     FROM cte_first_member_order
     WHERE purchase=1;
-
+```
 | customer_id | product_name | order_date               |
 | ----------- | ------------ | ------------------------ |
 | A           | curry        | 2021-01-07T00:00:00.000Z |
@@ -350,7 +357,8 @@ The favorite dish of customer A & customer C is ramen while the favorite dishes 
 
 Customer A bought curry and customer B had sushi after being a member.
 
--- 7. Which item was purchased just before the customer became a member?
+**7. Which item was purchased just before the customer became a member?**
+```sql
 WITH
     cte_last_order_before_member
     AS
@@ -367,7 +375,7 @@ WITH
 SELECT customer_id,product_name,order_date
 FROM cte_last_order_before_member
 WHERE purchase=1;
-
+```
 --Result:
 +──────────────+───────────────+───────────────────────────+
 | customer_id  | product_name  | order_date                |
@@ -381,7 +389,8 @@ WHERE purchase=1;
 
 Customer A bought sushi and curry while customer B had curry before being a member.
 
--- 8. What is the total items and amount spent for each member before they became a member?
+**8. What is the total items and amount spent for each member before they became a member?**
+```sql
 WITH
     cte_spent_before_mem
     AS
@@ -395,7 +404,7 @@ WITH
     )
 SELECT *
 FROM cte_spent_before_mem;
-
+```
 
 --Result:
 +──────────────+──────────────+──────────────+
@@ -404,11 +413,12 @@ FROM cte_spent_before_mem;
 | A            | 25           | 2            |
 | B            | 40           | 3            |
 +──────────────+──────────────+──────────────+
-**Insights:**
 
+**Insights:**
 Before becoming a member customer A spent 25$ on 2  products while customer B spent 40$ on 3 products.
 
--- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+**9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
+```sql
 SELECT customer_id, 
        SUM(CASE WHEN product_name = 'sushi' THEN  (price * 20)
             ELSE (price * 10) END ) AS total_points,
@@ -416,6 +426,7 @@ SELECT customer_id,
 FROM dannys_diner.sales AS s
 INNER JOIN dannys_diner.menu USING(product_id)
 GROUP BY customer_id;
+```
 
 | customer_id | total_points | total_item |
 | ----------- | ------------ | ---------- |
@@ -427,7 +438,7 @@ GROUP BY customer_id;
 
 Customer A has 860 points, customer B has 940 points and customer C has 360 points.
 
--- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+**10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
 
 ```sql
 SELECT dannys_diner.sales.customer_id , 
