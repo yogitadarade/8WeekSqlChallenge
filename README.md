@@ -37,7 +37,7 @@ Cover many core SQL skills and techniques required for data analysis from beginn
 
 ## ✅ Started 8 Week SQL Challenge Case Studies
 
-- [🥗 Case Study Nº1 - Danny's Diner](#https://github.com/yogitadarade/8WeekSqlChallenge/blob/main/CaseStudy%201-Danny's%20Dinner/README.md)
+- [🥗 Case Study Nº1 - Danny's Diner](https://github.com/yogitadarade/8WeekSqlChallenge/blob/main/CaseStudy%201-Danny's%20Dinner/README.md)
 - [🍕 Case Stud Nº2 - Pizza Runner](#)
 
 
