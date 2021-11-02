@@ -150,7 +150,52 @@ Customer order table contains 14 records
 
 
 ## Table#2 - runner_orders
+  
+  ```sql
+  SELECT * FROM  pizza_runner.runner_orders limit 10;
+  ```
 
+| order_id | runner_id | pickup_time         | distance | duration   | cancellation            |
+| -------- | --------- | ------------------- | -------- | ---------- | ----------------------- |
+| 1        | 1         | 2020-01-01 18:15:34 | 20km     | 32 minutes |                         |
+| 2        | 1         | 2020-01-01 19:10:54 | 20km     | 27 minutes |                         |
+| 3        | 1         | 2020-01-03 00:12:37 | 13.4km   | 20 mins    |                         |
+| 4        | 2         | 2020-01-04 13:53:03 | 23.4     | 40         |                         |
+| 5        | 3         | 2020-01-08 21:10:57 | 10       | 15         |                         |
+| 6        | 3         | null                | null     | null       | Restaurant Cancellation |
+| 7        | 2         | 2020-01-08 21:30:45 | 25km     | 25mins     | null                    |
+| 8        | 2         | 2020-01-10 00:15:02 | 23.4 km  | 15 minute  | null                    |
+| 9        | 2         | null                | null     | null       | Customer Cancellation   |
+| 10       | 1         | 2020-01-11 18:50:20 | 10km     | 10minutes  | null                    |
+
+ ```sql 
+ SELECT COUNT(*) FROM  pizza_runner.runner_orders;
+```
+| count |
+| ----- |
+| 10    | 
+  
+  ```sql
+  SELECT
+          table_name,
+          column_name,
+          data_type,
+          column_default,
+          is_nullable
+        FROM information_schema.columns
+        WHERE table_name = 'runner_orders';
+```
+| table_name    | column_name  | data_type         | column_default | is_nullable |
+| ------------- | ------------ | ----------------- | -------------- | ----------- |
+| runner_orders | order_id     | integer           |    null        | YES         |
+| runner_orders | runner_id    | integer           |    null        | YES         |
+| runner_orders | pickup_time  | character varying |    null        | YES         |
+| runner_orders | distance     | character varying |    null        | YES         |
+| runner_orders | duration     | character varying |    null        | YES         |
+| runner_orders | cancellation | character varying |    null        | YES         |
+ 
+  
+  
 </details>
 
 # 👩‍💻Data Preprocessing
@@ -158,7 +203,21 @@ Customer order table contains 14 records
 <summary>
 View 
 </summary>
-
+CREATE  TABLE cleaned_customer_orders AS
+SELECT 
+  order_id, 
+  customer_id, 
+  pizza_id, 
+  CASE
+	  WHEN exclusions IS null OR exclusions LIKE 'null' THEN ' '
+	  ELSE exclusions
+	  END AS exclusions,
+  CASE
+	  WHEN extras IS NULL or extras LIKE 'null' THEN ' '
+	  ELSE extras
+	  END AS extras,
+	order_time
+FROM pizza_runner.customer_orders;
 
 </details>
 
