@@ -354,10 +354,12 @@ WHERE table_name = 'pizza_recipes';
 <summary>
 View 
 </summary>
-```sql	
+
 	
 ** CLeaning customer_orders**
+	
 Here i am updating null values to be empty(NULL) to indicate customers ordered no extras/exclusions. The string`null is updated to empty(NULL). Ideally this columns should have defalut value as 0.
+	
 ```sql
 DROP TABLE IF EXISTS cleaned_customer_orders;
 CREATE TEMP TABLE cleaned_customer_orders AS (
@@ -402,8 +404,10 @@ SELECT * FROM cleaned_customer_orders;
 | 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11T18:34:49.000Z |
 
 **cleaning runner_orders**
+	
 km and minutes needs to be removed. for that using   REGEXP_REPLACE  which returns a new string with the substrings, which match a regular expression pattern, replaced by a new substring.The NULLIF function returns NULL if and only if value1 and value2 are equal. Otherwise it returns value1. so using NULLIF.
 cleaning pickuptime which had `null` string in it.
+
 ```sql
 DROP TABLE IF EXISTS cleaned_runner_orders;	
 CREATE TEMP TABLE cleaned_runner_orders AS (
@@ -425,7 +429,7 @@ CREATE TEMP TABLE cleaned_runner_orders AS (
       FROM
         pizza_runner.runner_orders
  SELECT * FROM cleaned_runner_orders;
-```sql
+```
 
 | order_id | runner_id | pickup_time              | distance | duration | cancellation            |
 | -------- | --------- | ------------------------ | -------- | -------- | ----------------------- |
@@ -441,11 +445,104 @@ CREATE TEMP TABLE cleaned_runner_orders AS (
 | 10       | 1         | 2020-01-11T18:50:20.000Z | 10       | 10       |                         |
 	
 **change datatype**
+```sql
 ALTER TABLE cleaned_runner_orders
 ALTER COLUMN pickup_time DATETIME,
 ALTER COLUMN distance FLOAT,
 ALTER COLUMN duration INT;
-	
+```
 </details>
 
 <h1><b>🛠Solution</b></h1>
+
+##Pizza Metrics
+**1.How many pizzas were ordered?**
+
+```sql
+SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
+```
+
+| count |
+| ----- |
+| 14    |
+
+**Insight** 
+14 pizzas were ordered.
+
+**2.How many unique customer orders were made?**
+
+```sql
+ SELECT COUNT(DISTINCT order_id)
+    FROM pizza_runner.cleaned_customer_orders;
+```
+| count |
+| ----- |
+| 10    |
+
+**Insight** 
+10 unique customers order were made
+
+**3.How many successful orders were delivered by each runner?**
+
+```sql
+ SELECT 
+      runner_id, 
+      COUNT(order_id) AS successful_orders
+    FROM pizza_runner.cleaned_runner_orders
+    WHERE  cancellation IS NUll or cancellation NOT IN ('Restaurant Cancellation','Customer Cancellation')
+    GROUP BY runner_id;
+
+| runner_id | successful_orders |
+| --------- | ----------------- |
+| 1         | 4                 |
+| 2         | 3                 |
+| 3         | 1                 |
+
+```
+**Insight**
+Runner 1 has 4 successful delivered order  , and runner 2 and 3 each delivered 3 ,1  order respectively.
+
+**4.How many of each type of pizza was delivered?**
+```sql
+ SELECT
+    	pizza_name,
+    	COUNT(pizza_id)
+ FROM pizza_runner.cleaned_runner_orders 
+ JOIN pizza_runner.cleaned_customer_orders USING(order_id)
+ JOIN pizza_runner.pizza_names USING (pizza_id)
+ WHERE  cancellation IS NUll or cancellation NOT IN ('Restaurant Cancellation','Customer Cancellation')
+ GROUP BY pizza_name;
+ ```
+
+| pizza_name | count |
+| ---------- | ----- |
+| Vegetarian | 3     |
+| Meatlovers | 9     |
+
+**Insight**
+There are 9  Meatlovers pizzas and 3 Vegetarian pizzas were delivered.
+
+**5.How many Vegetarian and Meatlovers were ordered by each customer?**
+
+```sql
+    SELECT 
+      c.customer_id, 
+      p.pizza_name, 
+      COUNT(p.pizza_name) AS order_count
+    FROM pizza_runner.cleaned_customer_orders AS c
+    JOIN pizza_runner.pizza_names AS p
+      ON c.pizza_id= p.pizza_id
+    GROUP BY c.customer_id, p.pizza_name
+    ORDER BY c.customer_id;
+```
+| customer_id | pizza_name | order_count |
+| ----------- | ---------- | ----------- |
+| 101         | Meatlovers | 2           |
+| 101         | Vegetarian | 1           |
+| 102         | Meatlovers | 2           |
+| 102         | Vegetarian | 1           |
+| 103         | Meatlovers | 3           |
+| 103         | Vegetarian | 1           |
+| 104         | Meatlovers | 3           |
+| 105         | Vegetarian | 1           |
+
