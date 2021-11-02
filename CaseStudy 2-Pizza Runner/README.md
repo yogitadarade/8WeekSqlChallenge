@@ -494,14 +494,14 @@ SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
     FROM pizza_runner.cleaned_runner_orders
     WHERE  cancellation IS NUll or cancellation NOT IN ('Restaurant Cancellation','Customer Cancellation')
     GROUP BY runner_id;
-
+```
 | runner_id | successful_orders |
 | --------- | ----------------- |
 | 1         | 4                 |
 | 2         | 3                 |
 | 3         | 1                 |
 
-```
+
 **Insight**
 
 Runner 1 has 4 successful delivered order  , and runner 2 and 3 each delivered 3 ,1  order respectively.
