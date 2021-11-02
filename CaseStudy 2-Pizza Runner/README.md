@@ -87,6 +87,7 @@ View
 <img src="ERD-Pizzarunner.png" width=70% height=70%>
 
 Danny has shared with  6 interconnected datasets for this case study
+	
 1.`customer_orders`
 2.`runner_orders`
 3.`runners`
@@ -107,7 +108,7 @@ Danny has shared with  6 interconnected datasets for this case study
 | 1        | 101         | 1        |            |        | 2020-01-01T18:05:02.000Z |
 | 2        | 101         | 1        |            |        | 2020-01-01T19:00:52.000Z |
 | 3        | 102         | 1        |            |        | 2020-01-02T23:51:23.000Z |
-| 3        | 102         | 2        |            | NAN    | 2020-01-02T23:51:23.000Z |
+| 3        | 102         | 2        |            |      | 2020-01-02T23:51:23.000Z |
 | 4        | 103         | 1        | 4          |        | 2020-01-04T13:23:46.000Z |
 | 4        | 103         | 1        | 4          |        | 2020-01-04T13:23:46.000Z |
 | 4        | 103         | 2        | 4          |        | 2020-01-04T13:23:46.000Z |
@@ -117,8 +118,7 @@ Danny has shared with  6 interconnected datasets for this case study
 
 
 
-**Observation**
-The pizza_id relates to the type of pizza which was ordered whilst the exclusions are the ingredient_id values which should be removed from the pizza and the extras are the ingredient_id values which need to be added to the pizza.The exclusions and extras columns will need to be cleaned up.
+
 ```sql
 SELECT count(*) 
 FROM pizza_runner.customer_orders;
@@ -127,8 +127,7 @@ FROM pizza_runner.customer_orders;
 | ----- |
 | 14    |
 
-**Observation**
-Customer order table contains 14 records
+
 ```sql
  SELECT
       table_name,
@@ -141,12 +140,16 @@ Customer order table contains 14 records
 ```
 | table_name      | column_name | data_type                   | column_default | is_nullable |
 | --------------- | ----------- | --------------------------- | -------------- | ----------- |
-| customer_orders | order_id    | integer                     |    NAN         | YES         |
-| customer_orders | customer_id | integer                     |    NAN         | YES         |
-| customer_orders | pizza_id    | integer                     |    NAN         | YES         |
-| customer_orders | order_time  | timestamp without time zone |    NAN         | YES         |
-| customer_orders | exclusions  | character varying           |    NAN         | YES         |
-| customer_orders | extras      | character varying           |    NAN         | YES         |
+| customer_orders | order_id    | integer                     |                | YES         |
+| customer_orders | customer_id | integer                     |                | YES         |
+| customer_orders | pizza_id    | integer                     |                | YES         |
+| customer_orders | order_time  | timestamp without time zone |                | YES         |
+| customer_orders | exclusions  | character varying           |                | YES         |
+| customer_orders | extras      | character varying           |                | YES         |
+
+**Observation**
+	
+The pizza_id relates to the type of pizza which was ordered whilst the exclusions are the ingredient_id values which should be removed from the pizza and the extras are the ingredient_id values which need to be added to the pizza.The exclusions and extras columns will need to be cleaned up.Customer order table contains 14 records
 
 
 ## Table#2 - runner_orders
@@ -187,14 +190,17 @@ Customer order table contains 14 records
 ```
 | table_name    | column_name  | data_type         | column_default | is_nullable |
 | ------------- | ------------ | ----------------- | -------------- | ----------- |
-| runner_orders | order_id     | integer           |    null        | YES         |
-| runner_orders | runner_id    | integer           |    null        | YES         |
-| runner_orders | pickup_time  | character varying |    null        | YES         |
-| runner_orders | distance     | character varying |    null        | YES         |
-| runner_orders | duration     | character varying |    null        | YES         |
-| runner_orders | cancellation | character varying |    null        | YES         |
+| runner_orders | order_id     | integer           |                | YES         |
+| runner_orders | runner_id    | integer           |                | YES         |
+| runner_orders | pickup_time  | character varying |                | YES         |
+| runner_orders | distance     | character varying |                | YES         |
+| runner_orders | duration     | character varying |                | YES         |
+| runner_orders | cancellation | character varying |                | YES         |
  
+**Observation**
+Distance and duration has inconsistent scale, like min, minutes, km .Distance,duration, pickuptime datatype are varchar . `null` string has been inserted for orders that are cancelled .This fields  needs cleaning and datattype has to be changed.This table has 10 records
   
+	
  ## Table#3 - runner
 ```sql
 SELECT  * FROM pizza_runner.runners;
@@ -217,19 +223,21 @@ SELECT  COUNT(*) FROM pizza_runner.runners;
 	
 ```sql
 SELECT
-          table_name,
-          column_name,
-          data_type,
-          column_default,
-          is_nullable
+  table_name,
+  column_name,
+  data_type,
+  column_default,
+  is_nullable
 FROM information_schema.columns
 WHERE table_name = 'runners';
 ```
 | table_name | column_name       | data_type | column_default | is_nullable |
 | ---------- | ----------------- | --------- | -------------- | ----------- |
-| runners    | runner_id         | integer   |     null       | YES         |
-| runners    | registration_date | date      |     null       | YES         |	
+| runners    | runner_id         | integer   |                | YES         |
+| runners    | registration_date | date      |                | YES         |	
 
+**Observation**
+There are 4 runners and this table shows the registration date of the runner.
 	
  ## Table#4 - pizza_names
 ```sql	
@@ -261,8 +269,12 @@ SELECT * FROM pizza_runner.pizza_names;
 	
 | table_name  | column_name | data_type | column_default | is_nullable |
 | ----------- | ----------- | --------- | -------------- | ----------- |
-| pizza_names | pizza_id    | integer   |   null         | YES         |
-| pizza_names | pizza_name  | text      |   null         | YES         |
+| pizza_names | pizza_id    | integer   |                | YES         |
+| pizza_names | pizza_name  | text      |                | YES         |
+	
+
+**Observation**
+There are  only 2 types of pizza.
 	
 ## Table#5 - pizza_toppings
 	
@@ -286,20 +298,51 @@ SELECT * FROM pizza_runner.pizza_toppings limit 5;
 | 12    |
 	
 ```sql	
-	SELECT
-              table_name,
-              column_name,
-              data_type,
-              column_default,
-              is_nullable
-    FROM information_schema.columns
-    WHERE table_name = 'pizza_toppings';
+SELECT
+      table_name,
+      column_name,
+      data_type,
+      column_default,
+      is_nullable
+FROM information_schema.columns
+WHERE table_name = 'pizza_toppings';
 ```
 | table_name     | column_name  | data_type | column_default | is_nullable |
 | -------------- | ------------ | --------- | -------------- | ----------- |
-| pizza_toppings | topping_id   | integer   |     null       | YES         |
-| pizza_toppings | topping_name | text      |     null       | YES         |
+| pizza_toppings | topping_id   | integer   |                | YES         |
+| pizza_toppings | topping_name | text      |                | YES         |
+
+
+**Observation**
+There are  only 12 records in this table.
+
+## Table#6 - pizza_recipes
+ 
+```sql
+SELECT * FROM pizza_runner.pizza_recipes;
+```
 	
+| pizza_id | toppings                |
+| -------- | ----------------------- |
+| 1        | 1, 2, 3, 4, 5, 6, 8, 10 |
+| 2        | 4, 6, 7, 9, 11, 12      |
+	
+```sql 
+SELECT
+  table_name,
+  column_name,
+  data_type,
+  column_default,
+  is_nullable
+FROM information_schema.columns
+WHERE table_name = 'pizza_recipes';
+```
+
+| table_name    | column_name | data_type | column_default | is_nullable |
+| ------------- | ----------- | --------- | -------------- | ----------- |
+| pizza_recipes | pizza_id    | integer   |                | YES         |
+| pizza_recipes | toppings    | text      |                | YES         |
+
 </details>
 
 
@@ -311,22 +354,98 @@ SELECT * FROM pizza_runner.pizza_toppings limit 5;
 <summary>
 View 
 </summary>
-CREATE  TABLE cleaned_customer_orders AS
-SELECT 
-  order_id, 
-  customer_id, 
-  pizza_id, 
-  CASE
-	  WHEN exclusions IS null OR exclusions LIKE 'null' THEN ' '
-	  ELSE exclusions
-	  END AS exclusions,
-  CASE
-	  WHEN extras IS NULL or extras LIKE 'null' THEN ' '
-	  ELSE extras
-	  END AS extras,
-	order_time
-FROM pizza_runner.customer_orders;
+```sql	
+	
+** CLeaning customer_orders**
+Here i am updating null values to be empty(NULL) to indicate customers ordered no extras/exclusions. The string`null is updated to empty(NULL). Ideally this columns should have defalut value as 0.
+```sql
+DROP TABLE IF EXISTS cleaned_customer_orders;
+CREATE TEMP TABLE cleaned_customer_orders AS (
+  SELECT
+    order_id,
+    customer_id,
+    pizza_id,
+    CASE
+      WHEN exclusions = '' THEN NULL
+      WHEN exclusions = 'null' THEN NULL
+      ELSE exclusions
+    END AS exlcusions,
+    CASE
+      WHEN extras = '' THEN NULL
+      WHEN extras = 'null' THEN NULL
+      WHEN extras = 'Nan' THEN NULL
+      ELSE extras
+    END AS extras,
+    order_time
+  FROM
+    pizza_runner.customer_orders
+);
 
+SELECT * FROM cleaned_customer_orders;
+```
+
+| order_id | customer_id | pizza_id | exlcusions | extras | order_time               |
+| -------- | ----------- | -------- | ---------- | ------ | ------------------------ |
+| 1        | 101         | 1        |            |        | 2020-01-01T18:05:02.000Z |
+| 2        | 101         | 1        |            |        | 2020-01-01T19:00:52.000Z |
+| 3        | 102         | 1        |            |        | 2020-01-02T23:51:23.000Z |
+| 3        | 102         | 2        |            |        | 2020-01-02T23:51:23.000Z |
+| 4        | 103         | 1        | 4          |        | 2020-01-04T13:23:46.000Z |
+| 4        | 103         | 1        | 4          |        | 2020-01-04T13:23:46.000Z |
+| 4        | 103         | 2        | 4          |        | 2020-01-04T13:23:46.000Z |
+| 5        | 104         | 1        |            | 1      | 2020-01-08T21:00:29.000Z |
+| 6        | 101         | 2        |            |        | 2020-01-08T21:03:13.000Z |
+| 7        | 105         | 2        |            | 1      | 2020-01-08T21:20:29.000Z |
+| 8        | 102         | 1        |            |        | 2020-01-09T23:54:33.000Z |
+| 9        | 103         | 1        | 4          | 1, 5   | 2020-01-10T11:22:59.000Z |
+| 10       | 104         | 1        |            |        | 2020-01-11T18:34:49.000Z |
+| 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11T18:34:49.000Z |
+
+**cleaning runner_orders**
+km and minutes needs to be removed. for that using   REGEXP_REPLACE  which returns a new string with the substrings, which match a regular expression pattern, replaced by a new substring.The NULLIF function returns NULL if and only if value1 and value2 are equal. Otherwise it returns value1. so using NULLIF.
+cleaning pickuptime which had `null` string in it.
+```sql
+DROP TABLE IF EXISTS cleaned_runner_orders;	
+CREATE TEMP TABLE cleaned_runner_orders AS (
+      SELECT
+        order_id,
+        runner_id,
+        CASE
+          WHEN pickup_time = 'null' THEN null
+          ELSE pickup_time
+        END :: timestamp AS pickup_time,
+        
+        NULLIF(REGEXP_REPLACE(distance, '[^0-9.]', '', 'g'), '') :: numeric AS distance,
+        NULLIF(REGEXP_REPLACE(duration, '[^0-9.]', '', 'g'), '') :: numeric AS duration,
+        
+        CASE
+          WHEN cancellation IN ('null', 'NaN', '') THEN null
+          ELSE cancellation
+        END AS cancellation
+      FROM
+        pizza_runner.runner_orders
+ SELECT * FROM cleaned_runner_orders;
+```sql
+
+| order_id | runner_id | pickup_time              | distance | duration | cancellation            |
+| -------- | --------- | ------------------------ | -------- | -------- | ----------------------- |
+| 1        | 1         | 2020-01-01T18:15:34.000Z | 20       | 32       |                         |
+| 2        | 1         | 2020-01-01T19:10:54.000Z | 20       | 27       |                         |
+| 3        | 1         | 2020-01-03T00:12:37.000Z | 13.4     | 20       |                         |
+| 4        | 2         | 2020-01-04T13:53:03.000Z | 23.4     | 40       |                         |
+| 5        | 3         | 2020-01-08T21:10:57.000Z | 10       | 15       |                         |
+| 6        | 3         |                          |          |          | Restaurant Cancellation |
+| 7        | 2         | 2020-01-08T21:30:45.000Z | 25       | 25       |                         |
+| 8        | 2         | 2020-01-10T00:15:02.000Z | 23.4     | 15       |                         |
+| 9        | 2         |                          |          |          | Customer Cancellation   |
+| 10       | 1         | 2020-01-11T18:50:20.000Z | 10       | 10       |                         |
+	
+**change datatype**
+ALTER TABLE cleaned_runner_orders
+ALTER COLUMN pickup_time DATETIME,
+ALTER COLUMN distance FLOAT,
+ALTER COLUMN duration INT;
+	
 </details>
 
 <h1><b>🛠Solution</b></h1>
