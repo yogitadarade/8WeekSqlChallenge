@@ -1,16 +1,16 @@
-# 8- Week SQL Challenge
+# 8 Week SQL Challenge
 # Case Study # 1 - Danny's Diner 
 
 > This case study can be found in the  [8weeksqlchallenge.com](https://8weeksqlchallenge.com/case-study-1/).
 
-![logo danny diner](logo_dinner.png)
+<img src="logo_dinner.png" width=50% height=50%>
 
 
 # Table of contents
 - [📚About](#About)
 - [📜Problem Statement](#Problem-Statement)
 - [📌❓Case Study Questions](#Case-Study-Questions)
-- [🕵️‍♀️Understand & Explore Data](#Understand-Data)
+- [🕵️‍♀️Understand and Explore Data](#Understand-and-Explore-Data)
 - [⚒Solution](#Solution)
 
 <h1><b>📚About</b></h1>
@@ -40,10 +40,15 @@ These are the questions that were provided:
 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
-<h1><b>🕵️‍Understand  and Explore Data</b></h1>
+<h1><b>🕵️‍Understand and Explore Data</b></h1>
+<details>
+<summary>
+View 
+</summary>
 Danny provided a sample of his overall customer data due to privacy issues. He also provided an entity-relationship diagram (ERD).
 
-![erd danny diner](ERD.png)
+
+<img src="ERD.png" width=70% height=70%>
 
 There are 3 tables in the ERD:
 
@@ -88,7 +93,7 @@ FROM dannys_diner.sales;
 There were a total of 15 sales in the ``sales`` table.
 
 **2. Check Datatypes, default values, and if the columns can contains null records**
- This table was created with the script and we have access to ERD , but it is good practice to check the datatypes before move ahead which questions
+ This table was created with the script and we have access to ERD , but it is good practice to check the datatypes before we move ahead which questions
  ```sql   
     SELECT
       table_name,
@@ -184,10 +189,15 @@ LIMIT 5;
 
 **Observation**
 This table contains the ``customer_id`` and date when the joined reward program of the restaurant.
-
+ </details>
 <h1><b>🛠Solution</b></h1>
 
 **1. What is the total amount each customer spent at the restaurant?**
+
+  Price is in menu table so joining sales with menu.Since we need amount for  `each customer` we group by customer_id 
+  and we need total so using aggregate function `SUM`.
+
+ 
 ```sql
 SELECT 
 	sales.customer_id,
@@ -198,7 +208,7 @@ JOIN dannys_diner.menu
 GROUP BY customer_id
 ORDER BY customer_id;
 ```
---Result:
+Output:
 
 | customer_id  | total_spent  |
 |--------------|--------------|
@@ -209,9 +219,11 @@ ORDER BY customer_id;
 
 **Insights:**
 
-Customer A spent 76$ in total, Customer B spent 74$ in total and Customer C spent only 36$ in total.
+Customer `A` spent 76$ in total, Customer `B` spent 74$ in total and Customer `C` spent only 36$ in total.
 
 **2. How many days has each customer visited the restaurant?**
+ We need  `each customer`, so we group by customer and we need count  so using aggregate function `COUNT`
+
 ```sql
 SELECT
   customer_id,
@@ -219,7 +231,7 @@ SELECT
 FROM dannys_diner.sales
 GROUP BY customer_id;
 ```
---Result:
+Output:
 
 | customer_id  | visited_days  |
 |--------------|-------------- |
@@ -230,9 +242,17 @@ GROUP BY customer_id;
 
 **Insights:**
 
-Customer B visited the store 6 times, customer A 4 times and customer C only 2 times.
+Customer `B` visited the store 6 times, customer `A` 4 times and customer `C` only 2 times.
 
 **3. What was the first item from the menu purchased by each customer?**
+
+In this question , how do we know which item they purchased, for first time there is not time field.
+For eg customer A ordered Sushi and Curry , so should we assume since Sushi was first inserted therefore that was first item. 
+Product name is in menu table so joining sales with menu.
+Using Window function `ROW_NUMBER`  that assigns a sequential integer to each row in a result set and partitioning by customer id. 
+and then filtering the result set where first purchase is 1
+
+
 ```sql
 WITH cte_order AS (
   SELECT
@@ -243,27 +263,28 @@ WITH cte_order AS (
       ORDER BY 
         sales.order_date,  
         sales.product_id
-    ) AS item_order
+    ) AS first_purchase
     FROM dannys_diner.sales
     JOIN dannys_diner.menu
     ON sales.product_id = menu.product_id
 )
 SELECT * FROM cte_order
-WHERE item_order = 1;
+WHERE first_purchase = 1;
 ```
---Result:
+Output:
 
-| customer_id  | product_name  | item_order  |
-|--------------|-------------- |-------------|
-| A            | sushi         | 1           |
-| B            | curry         | 1           |
-| C            | ramen         | 1           |
+| customer_id  | product_name  | first_purchase|
+|--------------|-------------- |---------------|
+| A            | sushi         | 1             |
+| B            | curry         | 1             |
+| C            | ramen         | 1             |
 
 **Insights:**
 
-Customer A had curry and sushi for the first time, customer B had curry and customer C had ramen.
+Customer `A` had sushi for the first time, customer `B` had curry and customer `C` had ramen.
 
 **4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
+
 ```sql
 SELECT
   menu.product_name,
@@ -276,17 +297,18 @@ GROUP BY
 ORDER BY order_count DESC
 LIMIT 1;
 ```
---Result:
+Output:
 | product_id  | product_name  | order_count  |
-|--------------|--------------|--------------|
+|-------------|---------------|--------------|
 | 3           | ramen         | 8            |
-+─────────────+───────────────+──────────────+
+
 
  **Insights:**
 
-The most consumed product was ramen as it was purchased 8 times.
+The most purchased product was `ramen` as it was purchased 8 times.
 
 **5. Which item was the most popular for each customer?**
+
 ```sql
 WITH cte_order_count AS (
   SELECT
@@ -312,7 +334,7 @@ cte_popular_rank AS (
 SELECT * FROM cte_popular_rank
 WHERE rank = 1;
 ```
---Result:
+Output:
 
 | customer_id  | product_name  | order_count  | rank  |
 |--------------|---------------|--------------|-------|
@@ -334,7 +356,7 @@ The favorite dish of customer A & customer C is ramen while the favorite dishes 
         cte_first_member_order
         AS
         (
-            SELECT customer_id, product_name, order_date, RANK() OVER(
+        SELECT customer_id, product_name, order_date, RANK() OVER(
         PARTITION BY customer_id
         ORDER BY order_date) as purchase
             FROM dannys_diner.sales AS s
@@ -347,6 +369,8 @@ The favorite dish of customer A & customer C is ramen while the favorite dishes 
     FROM cte_first_member_order
     WHERE purchase=1;
 ```
+Output:
+
 | customer_id | product_name | order_date               |
 | ----------- | ------------ | ------------------------ |
 | A           | curry        | 2021-01-07T00:00:00.000Z |
@@ -357,6 +381,7 @@ The favorite dish of customer A & customer C is ramen while the favorite dishes 
 Customer A bought curry and customer B had sushi after being a member.
 
 **7. Which item was purchased just before the customer became a member?**
+
 ```sql
 WITH
     cte_last_order_before_member
@@ -375,7 +400,7 @@ SELECT customer_id,product_name,order_date
 FROM cte_last_order_before_member
 WHERE purchase=1;
 ```
---Result:
+Output:
 
 | customer_id  | product_name  | order_date                |
 |--------------|---------------|---------------------------|
@@ -390,6 +415,7 @@ Customer A bought sushi and curry while customer B had curry before being a memb
 
 **8. What is the total items and amount spent for each member before they became a member?**
 
+
 ```sql
 WITH
     cte_spent_before_mem
@@ -398,15 +424,14 @@ WITH
         SELECT customer_id, SUM(price) AS total_spent,count(s.product_id) as total_item
         FROM dannys_diner.sales AS s
             INNER JOIN dannys_diner.menu USING(product_id)
-            LEFT JOIN dannys_diner.members AS mem  USING(customer_id) 
+            INNER JOIN dannys_diner.members AS mem  USING(customer_id) 
         WHERE s.order_date < join_date
         GROUP BY customer_id
     )
 SELECT *
 FROM cte_spent_before_mem;
 ```
-
---Result:
+Output:
 
 | customer_id  | total_spent  | total_items  |
 |--------------|--------------|--------------|
@@ -419,6 +444,9 @@ Before becoming a member customer A spent 25$ on 2  products while customer B sp
 
 **9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 
+Case expression are really helpful in such scenarois and behave similar to if else statements So if product is sushi then we multiply price by 20 
+or else multiply price by 10
+
 ```sql
 SELECT customer_id, 
        SUM(CASE WHEN product_name = 'sushi' THEN  (price * 20)
@@ -428,6 +456,7 @@ FROM dannys_diner.sales AS s
 INNER JOIN dannys_diner.menu USING(product_id)
 GROUP BY customer_id;
 ```
+Output:
 
 | customer_id | total_points | total_item |
 | ----------- | ------------ | ---------- |
@@ -441,28 +470,24 @@ Customer A has 860 points, customer B has 940 points and customer C has 360 poin
 
 **10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
 
+We need a range of date  from the date customer became a member till first 6 days( 1 week) , so we use CASE with 'and` condition.
+
 ```sql
 SELECT dannys_diner.sales.customer_id , 
-SUM( 
-CASE	 
-  	 
-  	WHEN 
-	order_date >= join_date AND order_date <= join_date + 6  THEN price * 20  
-    WHEN 
-  	product_name = 'sushi' THEN price * 20  
-  	WHEN 
-  	order_date < '2021-01-31' then price * 10 
-  	Else  
-  	NULL 
+SUM(CASE WHEN order_date >= join_date AND order_date <= join_date + 6  THEN price * 20  
+         WHEN product_name = 'sushi' THEN price * 20  
+  	ELSE  price * 10  
     END ) as points 
 FROM dannys_diner.sales 
 LEFT JOIN dannys_diner.menu USING (product_id) 
 LEFT JOIN dannys_diner.members USING (customer_id) 
-WHERE customer_id = 'A' OR customer_id = 'B' 
+WHERE (customer_id = 'A' OR customer_id = 'B') 
+AND order_date < '2021-01-31' 
 GROUP BY customer_id;
 ```
+Output:
 
-| customer_id | total_points |
+| customer_id | points       |
 |-------------|--------------|
 | A           | 1370         |
 | B           | 820          |
@@ -470,4 +495,7 @@ GROUP BY customer_id;
 **Insights:**
 
 At the end of january, customer A would have 1370 points while customer B would have 820 points.
+
+
+**Currently not attempting the bonus question , but will revisit it later**
 
