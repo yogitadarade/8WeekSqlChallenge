@@ -85,7 +85,7 @@ View
 </summary>
 
 <img src="ERD-Pizzarunner.png" width=70% height=70%>
-</details>
+
 Danny has shared with  6 interconnected datasets for this case study
 1.`customer_orders`
 2.`runner_orders`
@@ -97,10 +97,11 @@ Danny has shared with  6 interconnected datasets for this case study
 ## Table#1 - customer_orders
 
 **1.Get a preview of the ``customer_orders`` table.**
+ ```sql
  SELECT * 
     FROM pizza_runner.customer_orders
     LIMIT 10;
-
+```
 | order_id | customer_id | pizza_id | exclusions | extras | order_time               |
 | -------- | ----------- | -------- | ---------- | ------ | ------------------------ |
 | 1        | 101         | 1        |            |        | 2020-01-01T18:05:02.000Z |
@@ -118,17 +119,17 @@ Danny has shared with  6 interconnected datasets for this case study
 
 **Observation**
 The pizza_id relates to the type of pizza which was ordered whilst the exclusions are the ingredient_id values which should be removed from the pizza and the extras are the ingredient_id values which need to be added to the pizza.The exclusions and extras columns will need to be cleaned up.
-
+```sql
 SELECT count(*) 
 FROM pizza_runner.customer_orders;
-
+```
 | count |
 | ----- |
 | 14    |
 
 **Observation**
 Customer order table contains 14 records
-
+```sql
     SELECT
       table_name,
       column_name,
@@ -137,7 +138,7 @@ Customer order table contains 14 records
       is_nullable
     FROM information_schema.columns
     WHERE table_name = 'customer_orders';
-
+```
 | table_name      | column_name | data_type                   | column_default | is_nullable |
 | --------------- | ----------- | --------------------------- | -------------- | ----------- |
 | customer_orders | order_id    | integer                     |    NAN         | YES         |
@@ -150,7 +151,7 @@ Customer order table contains 14 records
 
 ## Table#2 - runner_orders
 
-
+</details>
 
 # 👩‍💻Data Preprocessing
 <details>
