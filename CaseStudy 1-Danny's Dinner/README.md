@@ -1,6 +1,3 @@
-# 8 Week SQL Challenge
-# Case Study # 1 - Danny's Diner 
-
 > This case study can be found in the  [8weeksqlchallenge.com](https://8weeksqlchallenge.com/case-study-1/).
 
 <img src="logo_dinner.png" width=50% height=50%>
@@ -25,7 +22,7 @@ Danny wants to use the data to answer a few simple questions about his customers
 
 He plans on using these insights to help him decide whether he should expand the existing customer loyalty program - additionally he needs help to generate some basic datasets so his team can easily inspect the data without needing to use SQL.
 
-<h1><b> 📌❓Case Study Questions</b></h1>
+<h1><b>📌❓Case Study Questions</b></h1>
 
 These are the questions that were provided:
 
@@ -41,6 +38,7 @@ These are the questions that were provided:
 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
 <h1><b>🕵️‍Understand and Explore Data</b></h1>
+
 <details>
 <summary>
 View 
