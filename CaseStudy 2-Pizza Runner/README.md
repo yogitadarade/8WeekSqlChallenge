@@ -468,6 +468,7 @@ SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
 | 14    |
 
 **Insight** 
+
 14 pizzas were ordered.
 
 **2.How many unique customer orders were made?**
@@ -481,6 +482,7 @@ SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
 | 10    |
 
 **Insight** 
+
 10 unique customers order were made
 
 **3.How many successful orders were delivered by each runner?**
@@ -505,6 +507,7 @@ SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
 Runner 1 has 4 successful delivered order  , and runner 2 and 3 each delivered 3 ,1  order respectively.
 
 **4.How many of each type of pizza was delivered?**
+
 ```sql
  SELECT
     	pizza_name,
@@ -556,8 +559,6 @@ Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.Customer 104 and 105 
 
 **6.What was the maximum number of pizzas delivered in a single order?**
 
-Sum number o
-
 ```sql
  WITH cte_get_total_pizza as(
         SELECT 
@@ -602,6 +603,7 @@ Maximum number of pizza delivered in a single order is 3 pizzas.
              WHERE  cancellation IS NUll 
              GROUP BY c.customer_id;
 ```
+
 | customer_id | at_least_1_change | no_changes |
 | ----------- | ----------------- | ---------- |
 | 101         | 0                 | 2          |
