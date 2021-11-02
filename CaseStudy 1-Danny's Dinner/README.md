@@ -1,7 +1,8 @@
-
+# 8- Week SQL Challenge
 # Case Study # 1 - Danny's Diner 
 
 > This case study can be found in the  [8weeksqlchallenge.com](https://8weeksqlchallenge.com/case-study-1/).
+
 ![logo danny diner](logo_dinner.png)
 
 
@@ -39,54 +40,36 @@ These are the questions that were provided:
 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
-# 🕵️‍♀️ Understand Data
+# 🕵️‍♀️ Understand  and Explore Data
 Danny provided a sample of his overall customer data due to privacy issues. He also provided an entity-relationship diagram (ERD).
 
 ![erd danny diner](ERD.png)
 
 There are 3 tables in the ERD:
 
-- ``members``
 - ``sales``
 - ``menu``
+-  ``members``
 
-## Table #1 - members 
+## Table#1 - sales
 
-The output was limited to only 5 rows to get a preview of the ``members`` table.
+**1.Get a preview of the ``sales`` table.**
 
-```sql
-SELECT * 
-FROM dannys_diner.members 
+SELECT
+  	* 
+FROM dannys_diner.sales
 LIMIT 5;
-```
-| customer_id | join_date  |
-|-------------|------------|
-| A           | 2021-01-07 |
-| B           | 2021-01-09 |
 
-This table contains the ``customer_id`` that joined the beta loyalty rewards program of the restaurant.
+| customer_id | order_date               | product_id |
+| ----------- | ------------------------ | ---------- |
+| A           | 2021-01-01T00:00:00.000Z | 1          |
+| A           | 2021-01-01T00:00:00.000Z | 2          |
+| A           | 2021-01-07T00:00:00.000Z | 2          |
+| A           | 2021-01-10T00:00:00.000Z | 3          |
+| A           | 2021-01-11T00:00:00.000Z | 3          |
 
-There is a unique sequential ``customer_id`` for each record in the table. There is also information about the date when the customer joined the loyalty program.
-
-In the ERD there is a linkage between this ``members`` table with the ``sales`` table via the ``customer_id`` field.
-
-There was no need to see how many records the ``members`` table had since the previous output  only returned 2 records.
-
-## Table#2 - sales
-
-The output was limited to only 5 rows to get a preview of the ``sales`` table.
-
-| customer_id | order_date | product_id |
-|-------------|------------|------------|
-| A           | 2021-01-01 | 1          |
-| A           | 2021-01-01 | 2          |
-| A           | 2021-01-07 | 2          |
-| A           | 2021-01-10 | 3          |
-| A           | 2021-01-11 | 3          |
-
-This table contains the ``product_id`` that every ``customer_id``purchased with a corresponding ``order_date``.
-
-The ``sales`` table is linked to the previous ``members`` table via the ``customer_id`` and also has a linkage with the ``menu`` table via the ``product_id`` field.
+**Observation**
+This table contains  ``customer_id`` and product they purchased on a given  ``order_date``.
 
 A ``COUNT`` was used to do a row count of the ``sales`` table.
 
@@ -97,15 +80,46 @@ FROM dannys_diner.sales;
 ```
 
 | count_sales |
-|-------|
-| 15    |
+|-------------|
+| 15          |
 
+
+**Observation**
 There were a total of 15 sales in the ``sales`` table.
 
-## Table#3 - menu
+**2. Check Datatypes, default values, and if the columns can contains null records**
+ This table was created with the script and we have access to ERD , but it is good practice to check the datatypes before move ahead which questions
+     SELECT
+      table_name,
+      column_name,
+      data_type,
+     column_default,
+     is_nullable
+    FROM information_schema.columns
+    WHERE table_name = 'sales';
 
-The output was limited to only 5 rows to get a preview of the ``menu`` table.
 
+| table_name | column_name | data_type         | column_default | is_nullable |
+| ---------- | ----------- | ----------------- | -------------- | ----------- |
+| sales      | order_date  | date              |  null          | YES         |
+| sales      | product_id  | integer           |  null          | YES         |
+| sales      | customer_id | character varying |  null          | YES         |
+
+**Observation**
+Columns can contain null values
+
+**3. Check for any null values in columns**
+ SELECT *  
+ FROM dannys_diner.sales
+ WHERE customer_id IS NULL or
+ order_date IS NULL or product_id IS NULL
+ 
+**Observation**
+No null values were found
+
+## Table#2 - menu
+
+**1.Get a preview of the ``menu`` table.**
 ```sql
 SELECT *
 FROM dannys_diner.menu
@@ -117,12 +131,57 @@ LIMIT 5;
 | 2          | curry        | 15    |
 | 3          | ramen        | 12    |
 
+**Observation**
 This table contains all the dishes with their prices, that are sold in the diner. 
-
 The ``menu`` table is linked to the previous ``sales`` table via the ``product_id``.
 
-There was no need to see how many products the ``menu`` table had since the previous output  only returned 3 products.
+**2. Check Datatypes, default values, and if the columns can contains null records**
 
+```sql
+   SELECT
+      table_name,
+      column_name,
+      data_type,
+     column_default,
+     is_nullable
+    FROM information_schema.columns
+    WHERE table_name = 'menu';
+```
+| table_name | column_name  | data_type         | column_default | is_nullable |
+| ---------- | ------------ | ----------------- | -------------- | ----------- |
+| menu       | product_id   | integer           |   null         | YES         |
+| menu       | price        | integer           |   null         | YES         |
+| menu       | product_name | character varying |   null         | YES         |
+
+**Observation**
+Columns can contain null values
+
+**3. Check for any null values in columns**
+
+    SELECT
+    FROM  dannys_diner.menu
+    WHERE product_id IS NULL OR
+    price IS NULL OR
+    product_name IS NULL ;
+ 
+**Observation**
+No null values were found
+
+
+## Table #3 - members 
+**1.Get a preview of the ``menu`` table.**
+```sql
+SELECT * 
+FROM dannys_diner.members 
+LIMIT 5;
+```
+| customer_id | join_date  |
+|-------------|------------|
+| A           | 2021-01-07 |
+| B           | 2021-01-09 |
+
+**Observation**
+This table contains the ``customer_id`` and date when the joined reward program of the restaurant.
 
 # ⚒ Solution
 
