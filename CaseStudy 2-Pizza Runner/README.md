@@ -348,9 +348,6 @@ WHERE table_name = 'pizza_recipes';
 </details>
 
 
-
-
-
 # 👩‍💻Data Preprocessing
 <details>
 <summary>
@@ -694,7 +691,8 @@ Lowest volume of pizza ordered is at 11 (11:00-12:00 am), 19 (7:00-8:00 pm)
 
 **Insights**
 Wednesday and Saturday are most popular days for ordering Pizza
-</detail>
+
+</details>
 
 ## B. Runner and Customer Experience
 <details>
@@ -771,6 +769,7 @@ Runner 1 takes 15 minutes, and 2 & 3 take 23 and 10 respectively.
 | 3           | 29  |
 
 **Insights**
+	
 There is a relation between number of pizza and time taken. More number of pizza more time it takes to prepare.
 
 
@@ -794,6 +793,7 @@ There is a relation between number of pizza and time taken. More number of pizza
 | 105         | 25.00                  |
 
 **Insights**
+	
 Customer 104 stays near to the Pizza Runner while customer 105 stays farthest from the Pizza Runner.
 
 
@@ -809,6 +809,7 @@ SELECT
 | 30             |
 
 **Insights**
+	
 The difference between longest and shortest  delivery time for all orders is 30 minutes.
 
 **6.What was the average speed for each runner for each delivery and do you notice any trend for these values?**
@@ -839,9 +840,11 @@ SELECT
 | 3         | 5        | 10.00    | 15.00           | 40.00            |
 
 **Insights**
+	
 Seeing the trends it seem the Average speed for the area is 35-45.In order to deliver pizza fast , runner id 2 is speeding. 
 
 **7.What is the successful delivery percentage for each runner?**
+	
 This is not right to attribute for successful delivery to runners as order cancellations are out of the runner’s control.
  ```sql
  SELECT 
@@ -861,6 +864,7 @@ This is not right to attribute for successful delivery to runners as order cance
 | 3         | 50           |
 
 **Insights**
+	
 - Runner 1 has 100% successful delivery.
 - Runner 2 has 75% successful delivery. 
 - Runner 3 has 50% successful delivery
@@ -869,7 +873,8 @@ This is not right to attribute for successful delivery to runners as order cance
 
 ## C. Ingredient Optimisation
 
-***1.What are the standard ingredients for each pizza?***
+**1.What are the standard ingredients for each pizza?**
+
 Good that I had normalized the pizza receipe table .
 
 ```sql
@@ -928,6 +933,7 @@ With cte_most_extra AS(
 | Bacon        | 4     |
 
 **Insights**
+
 Bacon was most commonly  added extra.
 
 **3.What was the most common exclusion?**
@@ -956,5 +962,7 @@ Bacon was most commonly  added extra.
 
 **Insights**
 Cheese was most excluded.Oh Man who are these people who are excluding cheese from pizza.
+
+**Will resume later**
 
 
