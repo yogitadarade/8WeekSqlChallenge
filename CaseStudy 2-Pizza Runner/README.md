@@ -873,6 +873,10 @@ This is not right to attribute for successful delivery to runners as order cance
 
 ## C. Ingredient Optimisation
 
+<details>
+	<summary>
+		View
+	</summary>
 **1.What are the standard ingredients for each pizza?**
 
 Good that I had normalized the pizza receipe table .
@@ -962,7 +966,7 @@ Bacon was most commonly  added extra.
 
 **Insights**
 Cheese was most excluded.Oh Man who are these people who are excluding cheese from pizza.
-
-**Will resume later**
+</details>
+**Thanks of checking this out .Will resume later with other questions**
 
 
