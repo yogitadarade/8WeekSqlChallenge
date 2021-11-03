@@ -343,6 +343,8 @@ WHERE table_name = 'pizza_recipes';
 | pizza_recipes | pizza_id    | integer   |                | YES         |
 | pizza_recipes | toppings    | text      |                | YES         |
 
+**Observation**
+ toppings column contains multiple values and is not normalized , it canbe diffcult to query this table.
 </details>
 
 
@@ -451,12 +453,22 @@ ALTER COLUMN pickup_time DATETIME,
 ALTER COLUMN distance FLOAT,
 ALTER COLUMN duration INT;
 ```
+** normalizing Pizza_recipes**	
+DROP TABLE IF EXISTS pizza_ingredients;
+ CREATE  TABLE pizza_ingredients AS(
+  SELECT pr.pizza_id,
+   regexp_split_to_table(pr.toppings, ',')::INTEGER AS topping_id
+  FROM pizza_runner.pizza_recipes pr);
+	
 </details>
 
 <h1><b>🛠Solution</b></h1>
 
 ## Pizza Metrics
-
+<details>
+	<summary>
+		View
+	</summary>
 **1.How many pizzas were ordered?**
 
 ```sql
@@ -581,7 +593,7 @@ Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.Customer 104 and 105 
 
 Maximum number of pizza delivered in a single order is 3 pizzas.
 
-**7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+**7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
 ```sql
     SELECT
       customer_id,
@@ -682,3 +694,267 @@ Lowest volume of pizza ordered is at 11 (11:00-12:00 am), 19 (7:00-8:00 pm)
 
 **Insights**
 Wednesday and Saturday are most popular days for ordering Pizza
+</detail>
+
+## B. Runner and Customer Experience
+<details>
+	<summary>
+		View
+	</summary>
+
+**1.How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
+```sql
+ SELECT to_char(registration_date, 'W') AS Week, COUNT(*)
+    FROM pizza_runner.runners
+    GROUP BY Week ORDEER BY week;
+```
+| week | count |
+| ---- | ----- |
+| 1    | 2     |
+| 2    | 1     |
+| 3    | 1     |
+
+**Insights**
+- On Week 1 of Jan 2021, 2 new runners signed up.
+- On Week 2 and 3 of Jan 2021, 1 new runner signed up.
+
+**2.What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
+```sql
+With cte_gettime as (
+SELECT cu.order_time, r.pickup_time, r.runner_id
+FROM pizza_runner.cleaned_runner_orders as r
+INNER JOIN pizza_runner.cleaned_customer_orders as cu
+on cu.order_id = r.order_id
+  WHERE cancellation IS NULL
+)
+SELECT cte.runner_id, EXTRACT(minute from AVG(cte.pickup_time - cte.order_time)) as avg_time
+FROM cte_gettime as cte
+WHERE cte.pickup_time is not null
+GROUP BY cte.runner_id
+ORDER BY cte.runner_id
+```
+| runner_id | avg_time |
+| --------- | -------- |
+| 1         | 15       |
+| 2         | 23       |
+| 3         | 10       |
+
+**Insights**
+Runner 1 takes 15 minutes, and 2 & 3 take 23 and 10 respectively.
+
+**3.Is there any relationship between the number of pizzas and how long the order takes to prepare?**
+```sql
+    WITH cte_time as
+    (
+    SELECT 
+      r.order_id,
+      EXTRACT(minute from (r.pickup_time - co.order_time)) as     pickup_minutes,
+      COUNT(co.order_id) AS pizza_count
+    FROM pizza_runner.cleaned_runner_orders AS r
+    INNER JOIN pizza_runner.cleaned_customer_orders AS co
+      USING(order_id)
+    WHERE r.cancellation IS NULL
+    GROUP BY r.order_id, pickup_minutes
+    ORDER BY pizza_count
+    )
+    
+    SELECT 
+    pizza_count,
+    AVG(pickup_minutes)
+    FROM cte_time
+    GROUP BY  pizza_count;
+```
+| pizza_count | avg |
+| ----------- | --- |
+| 1           | 12  |
+| 2           | 18  |
+| 3           | 29  |
+
+**Insights**
+There is a relation between number of pizza and time taken. More number of pizza more time it takes to prepare.
+
+
+**4.What was the average distance travelled for each customer?**
+```sql
+  SELECT 
+      co.customer_id,
+      ROUND(AVG(r.distance),2) AS avg_distance_travelled 
+    FROM pizza_runner.cleaned_runner_orders AS r
+    INNER JOIN pizza_runner.cleaned_customer_orders AS co
+      USING(order_id)
+    WHERE r.cancellation IS NULL
+    GROUP BY customer_id;
+```
+| customer_id | avg_distance_travelled |
+| ----------- | ---------------------- |
+| 101         | 20.00                  |
+| 102         | 16.73                  |
+| 103         | 23.40                  |
+| 104         | 10.00                  |
+| 105         | 25.00                  |
+
+**Insights**
+Customer 104 stays near to the Pizza Runner while customer 105 stays farthest from the Pizza Runner.
+
+
+**5.What was the difference between the longest and shortest delivery times for all orders?**
+```sql
+SELECT
+     MAX(duration) - MIN(duration) AS max_difference
+    FROM
+       pizza_runner.cleaned_runner_orders AS ro;
+```
+| max_difference |
+| -------------- |
+| 30             |
+
+**Insights**
+The difference between longest and shortest  delivery time for all orders is 30 minutes.
+
+**6.What was the average speed for each runner for each delivery and do you notice any trend for these values?**
+(Average speed = Distance in km / Duration in hour)
+```sql
+SELECT
+    runner_id,
+    order_id,
+    
+    ROUND(avg(distance),2) as distance,
+    round(avg(duration),2) as duration_in_min,
+     ROUND(avg(distance /(duration/60)),2) as speed_in_km_hour
+    FROM
+       pizza_runner.cleaned_runner_orders AS ro 
+    WHERE cancellation IS NULL
+    GROUP BY order_id,runner_id
+    ORDER BY runner_id;
+```
+| runner_id | order_id | distance | duration_in_min | speed_in_km_hour |
+| --------- | -------- | -------- | --------------- | ---------------- |
+| 1         | 1        | 20.00    | 32.00           | 37.50            |
+| 1         | 2        | 20.00    | 27.00           | 44.44            |
+| 1         | 3        | 13.40    | 20.00           | 40.20            |
+| 1         | 10       | 10.00    | 10.00           | 60.00            |
+| 2         | 4        | 23.40    | 40.00           | 35.10            |
+| 2         | 7        | 25.00    | 25.00           | 60.00            |
+| 2         | 8        | 23.40    | 15.00           | 93.60            |
+| 3         | 5        | 10.00    | 15.00           | 40.00            |
+
+**Insights**
+Seeing the trends it seem the Average speed for the area is 35-45.In order to deliver pizza fast , runner id 2 is speeding. 
+
+**7.What is the successful delivery percentage for each runner?**
+This is not right to attribute for successful delivery to runners as order cancellations are out of the runner’s control.
+ ```sql
+ SELECT 
+      runner_id, 
+      ROUND(100 * SUM(
+        CASE WHEN distance is null THEN 0
+        ELSE 1 END) / COUNT(*), 0) AS success_perc
+    FROM pizza_runner.cleaned_runner_orders
+    
+    GROUP BY runner_id
+    order by runner_id;
+```
+| runner_id | success_perc |
+| --------- | ------------ |
+| 1         | 100          |
+| 2         | 75           |
+| 3         | 50           |
+
+**Insights**
+- Runner 1 has 100% successful delivery.
+- Runner 2 has 75% successful delivery. 
+- Runner 3 has 50% successful delivery
+
+</details>
+
+## C. Ingredient Optimisation
+
+***1.What are the standard ingredients for each pizza?***
+Good that I had normalized the pizza receipe table .
+
+```sql
+    SELECT
+          pn.pizza_name,
+          pt.topping_name
+        FROM
+          pizza_runner.pizza_names pn
+        JOIN
+          pizza_runner.pizza_ingredients pi ON pi.pizza_id = pn.pizza_id
+        JOIN
+          pizza_runner.pizza_toppings pt ON pt.topping_id = pi.topping_id
+        ORDER BY
+          pn.pizza_name,
+          pt.topping_name;
+```
+| pizza_name | topping_name |
+| ---------- | ------------ |
+| Meatlovers | BBQ Sauce    |
+| Meatlovers | Bacon        |
+| Meatlovers | Beef         |
+| Meatlovers | Cheese       |
+| Meatlovers | Chicken      |
+| Meatlovers | Mushrooms    |
+| Meatlovers | Pepperoni    |
+| Meatlovers | Salami       |
+| Vegetarian | Cheese       |
+| Vegetarian | Mushrooms    |
+| Vegetarian | Onions       |
+| Vegetarian | Peppers      |
+| Vegetarian | Tomato Sauce |
+| Vegetarian | Tomatoes     |
+
+**2.What was the most commonly added extra?**
+```sql
+With cte_most_extra AS(
+    SELECT 
+    	pizza_id,
+      	REGEXP_SPLIT_TO_TABLE(extras, '[,\s]+')::INTEGER AS 		added_extras 
+     FROM pizza_runner.cleaned_customer_orders
+      )
+      
+    SELECT  topping_name, 
+      		  COUNT(added_extras)  
+      FROM 
+      cte_most_extra t
+      INNER JOIN pizza_runner.pizza_toppings pt
+      ON t.added_extras = pt.topping_id
+      
+    GROUP BY t.added_extras, pt.topping_name
+      ORDER BY 2 DESC
+      LIMIT 1;
+```
+| topping_name | count |
+| ------------ | ----- |
+| Bacon        | 4     |
+
+**Insights**
+Bacon was most commonly  added extra.
+
+**3.What was the most common exclusion?**
+ ```sql
+ With cte_most_excluded AS(
+    SELECT 
+    	pizza_id,
+      	REGEXP_SPLIT_TO_TABLE(exclusions, '[,\s]+')::INTEGER AS 	excluded 
+     FROM pizza_runner.cleaned_customer_orders
+      )
+      
+    SELECT  topping_name, 
+      		  COUNT(excluded)  
+      FROM 
+      cte_most_excluded t
+      INNER JOIN pizza_runner.pizza_toppings pt
+      ON t.excluded = pt.topping_id
+      
+    GROUP BY t.excluded, pt.topping_name
+      ORDER BY 2 DESC
+      LIMIT 1;
+```
+| topping_name | count |
+| ------------ | ----- |
+| Cheese       | 4     |
+
+**Insights**
+Cheese was most excluded.Oh Man who are these people who are excluding cheese from pizza.
+
+
