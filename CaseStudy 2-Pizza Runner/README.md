@@ -149,7 +149,7 @@ FROM pizza_runner.customer_orders;
 
 **Observation**
 	
-The pizza_id relates to the type of pizza which was ordered whilst the exclusions are the ingredient_id values which should be removed from the pizza and the extras are the ingredient_id values which need to be added to the pizza.The exclusions and extras columns will need to be cleaned up.Customer order table contains 14 records
+The pizza_id relates to the type of pizza which was ordered whilst the exclusions are the ingredient_id values which should be removed from the pizza and the extras are the ingredient_id values which need to be added to the pizza.The exclusions and extras columns will need to be cleaned up.Customer order table contains 14 records.
 
 
 ## Table#2 - runner_orders
@@ -198,10 +198,11 @@ The pizza_id relates to the type of pizza which was ordered whilst the exclusion
 | runner_orders | cancellation | character varying |                | YES         |
  
 **Observation**
-Distance and duration has inconsistent scale, like min, minutes, km .Distance,duration, pickuptime datatype are varchar . `null` string has been inserted for orders that are cancelled .This fields  needs cleaning and datattype has to be changed.This table has 10 records
+Distance and duration has inconsistent scale, like min, minutes, km .Distance,duration, pickuptime datatype are varchar . `null` string has been inserted for orders that are cancelled .This fields  needs cleaning and datattype has to be changed.This table has 10 records.
   
 	
  ## Table#3 - runner
+	
 ```sql
 SELECT  * FROM pizza_runner.runners;
 ```
@@ -240,6 +241,7 @@ WHERE table_name = 'runners';
 There are 4 runners and this table shows the registration date of the runner.
 	
  ## Table#4 - pizza_names
+	
 ```sql	
 SELECT * FROM pizza_runner.pizza_names;
 ```
@@ -274,6 +276,7 @@ SELECT * FROM pizza_runner.pizza_names;
 	
 
 **Observation**
+	
 There are  only 2 types of pizza.
 	
 ## Table#5 - pizza_toppings
@@ -344,7 +347,8 @@ WHERE table_name = 'pizza_recipes';
 | pizza_recipes | toppings    | text      |                | YES         |
 
 **Observation**
- toppings column contains multiple values and is not normalized , it canbe diffcult to query this table.
+	
+ Toppings column contains multiple values and is not normalized , it canbe diffcult to query this table.
 </details>
 
 
@@ -355,7 +359,7 @@ View
 </summary>
 
 	
-** CLeaning customer_orders**
+**Cleaning customer_orders**
 	
 Here i am updating null values to be empty(NULL) to indicate customers ordered no extras/exclusions. The string`null is updated to empty(NULL). Ideally this columns should have defalut value as 0.
 	
@@ -402,7 +406,7 @@ SELECT * FROM cleaned_customer_orders;
 | 10       | 104         | 1        |            |        | 2020-01-11T18:34:49.000Z |
 | 10       | 104         | 1        | 2, 6       | 1, 4   | 2020-01-11T18:34:49.000Z |
 
-**cleaning runner_orders**
+**Cleaning runner_orders**
 	
 km and minutes needs to be removed. for that using   REGEXP_REPLACE  which returns a new string with the substrings, which match a regular expression pattern, replaced by a new substring.The NULLIF function returns NULL if and only if value1 and value2 are equal. Otherwise it returns value1. so using NULLIF.
 cleaning pickuptime which had `null` string in it.
@@ -443,14 +447,15 @@ CREATE TEMP TABLE cleaned_runner_orders AS (
 | 9        | 2         |                          |          |          | Customer Cancellation   |
 | 10       | 1         | 2020-01-11T18:50:20.000Z | 10       | 10       |                         |
 	
-**change datatype**
+
+**Change datatype**
 ```sql
 ALTER TABLE cleaned_runner_orders
 ALTER COLUMN pickup_time DATETIME,
 ALTER COLUMN distance FLOAT,
 ALTER COLUMN duration INT;
 ```
-** normalizing Pizza_recipes**	
+**Creating new table based on  Pizza_recipes**	
 DROP TABLE IF EXISTS pizza_ingredients;
  CREATE  TABLE pizza_ingredients AS(
   SELECT pr.pizza_id,
@@ -461,11 +466,12 @@ DROP TABLE IF EXISTS pizza_ingredients;
 
 <h1><b>🛠Solution</b></h1>
 
-## Pizza Metrics
+## A.Pizza Metrics
 <details>
 	<summary>
 		View
 	</summary>
+	
 **1.How many pizzas were ordered?**
 
 ```sql
@@ -513,7 +519,7 @@ SELECT COUNT(*) FROM pizza_runner.cleaned_customer_orders;
 
 **Insight**
 
-Runner 1 has 4 successful delivered order  , and runner 2 and 3 each delivered 3 ,1  order respectively.
+Runner 1 has 4 successful  orders delivered  , and runner 2 and 3 each delivered 3 ,1  order respectively.
 
 **4.How many of each type of pizza was delivered?**
 
@@ -563,8 +569,10 @@ There are 9  Meatlovers pizzas and 3 Vegetarian pizzas were delivered.
 
 **Insight**
 
-Customer 101 ordered 2 Meatlovers and 1 Vegetarian pizza.Customer 102 ordered 2 Meatlovers  and 2 Vegetarian pizzas.
-Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.Customer 104 and 105  ordered 1 Meatlovers pizza and 1 Vegetarian pizza respectively.
+- Customer 101 ordered 2 Meatlovers and 1 Vegetarian pizza.
+- Customer 102 ordered 2 Meatlovers  and 2 Vegetarian pizzas.
+- Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.
+- Customer 104 and 105  ordered 1 Meatlovers pizza and 1 Vegetarian pizza respectively.
 
 **6.What was the maximum number of pizzas delivered in a single order?**
 
@@ -588,9 +596,10 @@ Customer 103 ordered 3 Meatlovers s and 1 Vegetarian pizza.Customer 104 and 105 
 
 **Insight**
 
-Maximum number of pizza delivered in a single order is 3 pizzas.
+Maximum number of pizza delivered in a single order is 3 .
 
 **7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
+	
 ```sql
     SELECT
       customer_id,
@@ -877,6 +886,7 @@ This is not right to attribute for successful delivery to runners as order cance
 	<summary>
 		View
 	</summary>
+	
 **1.What are the standard ingredients for each pizza?**
 
 Good that I had normalized the pizza receipe table .
@@ -913,11 +923,12 @@ Good that I had normalized the pizza receipe table .
 | Vegetarian | Tomatoes     |
 
 **2.What was the most commonly added extra?**
+	
 ```sql
 With cte_most_extra AS(
     SELECT 
     	pizza_id,
-      	REGEXP_SPLIT_TO_TABLE(extras, '[,\s]+')::INTEGER AS 		added_extras 
+      	REGEXP_SPLIT_TO_TABLE(extras, '[,\s]+')::INTEGER AS added_extras 
      FROM pizza_runner.cleaned_customer_orders
       )
       
@@ -967,6 +978,7 @@ Bacon was most commonly  added extra.
 **Insights**
 Cheese was most excluded.Oh Man who are these people who are excluding cheese from pizza.
 </details>
-**Thanks of checking this out .Will resume later with other questions**
+
+**Thanks for checking this out .Will resume later with other questions**
 
 
