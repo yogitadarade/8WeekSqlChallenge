@@ -5,7 +5,6 @@
 <img src="pizzarunnerlogo.png" width=50% height=50%>
 
 # Table of contents
-- [⚒Solution](#-Solution)
 - [📚About](#About)
 - [📜Problem Statement](#Problem-Statement)
 - [📌❓Case Study Questions](#Case-Study-Questions)
