@@ -447,20 +447,15 @@ CREATE TEMP TABLE cleaned_runner_orders AS (
 | 10       | 1         | 2020-01-11T18:50:20.000Z | 10       | 10       |                         |
 	
 
-**Change datatype**
-```sql
-ALTER TABLE cleaned_runner_orders
-ALTER COLUMN pickup_time DATETIME,
-ALTER COLUMN distance FLOAT,
-ALTER COLUMN duration INT;
-```
+
 **Creating new table based on  Pizza_recipes**	
+```sql	
 DROP TABLE IF EXISTS pizza_ingredients;
  CREATE  TABLE pizza_ingredients AS(
   SELECT pr.pizza_id,
    regexp_split_to_table(pr.toppings, ',')::INTEGER AS topping_id
   FROM pizza_runner.pizza_recipes pr);
-	
+```
 </details>
 
 <h1><b>🛠Solution</b></h1>
